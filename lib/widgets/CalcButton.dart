@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
 class CalcButton extends StatelessWidget {
+  final Widget child;
   final String text;
-  final int fillColor;
-  final int textColor;
+  final Color fillColor;
+  final Color textColor;
   final double textSize;
   final Function callback;
 
   const CalcButton({
     Key key,
+    this.child,
     this.text,
     this.fillColor,
-    this.textColor = 0xFFFFFFFF,
+    this.textColor = const Color(0xFFFFFFFF),
     this.textSize = 28,
     this.callback,
   }) : super(key: key);
@@ -19,25 +21,24 @@ class CalcButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(10),
+      margin: EdgeInsets.all(4),
       child: SizedBox(
-        width: 65,
         height: 65,
         child: FlatButton(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50.0),
+            borderRadius: BorderRadius.circular(20.0),
           ),
           onPressed: () {
             callback(text);
           },
-          child: Text(
+          child: child == null? Text(
             text,
             style: TextStyle(
               fontSize: textSize,
             ),
-          ),
-          color: fillColor != null ? Color(fillColor) : null,
-          textColor: Color(textColor),
+          ) : child,
+          color: fillColor != null ? fillColor : null,
+          textColor: textColor,
         ),
       ),
     );

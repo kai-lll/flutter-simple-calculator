@@ -19,6 +19,11 @@ class CalcAppState extends State<CalcApp> {
   final String _version = "v1.0.2";
   final ScrollController _controller = ScrollController();
 
+  final colorDarkGreen = Color(0xFF283637);
+  final colorGreen = Color(0xFF6C807F);
+  final colorLightGreen = Color(0xFF65BDAC);
+  final colorWhite = Color(0xFFFFFFFF);
+
   List<String> _history = [""];
   String _expression = '';
   bool get isFirst => _expression.isEmpty;
@@ -46,14 +51,17 @@ class CalcAppState extends State<CalcApp> {
     if (isNumeric(operator)) {
       return true;
     }
-    if (operator == "-") {
+    if (operator == "-" || operator == "(" || operator == ")") {
       return true;
     }
     if (_expression.isNotEmpty) {
-      bool isNumericEnd = isNumeric(_expression[_expression.length-1]);
+      String last = _expression[_expression.length-1];
+      bool isNumericEnd = isNumeric(last);
       if (isNumericEnd) {
         return true;
       } else {
+        if (last == ")")
+          return true;
         return false;
       }
     }
@@ -61,7 +69,12 @@ class CalcAppState extends State<CalcApp> {
     return false;
   }
 
+  void voidClick(String text) {
+
+  }
+
   void numClick(String text) {
+    //print(text);
     if (text == "x")
       text = "*";
 
@@ -121,11 +134,12 @@ class CalcAppState extends State<CalcApp> {
 
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Kai CALC',
       home: Scaffold(
-        backgroundColor: Color(0xFF283637),
+        backgroundColor: colorDarkGreen,
         body: Container(
           padding: EdgeInsets.all(12),
           child: Column(
@@ -148,7 +162,7 @@ class CalcAppState extends State<CalcApp> {
                         },
                         child: Text(formatedExpression(_history[index]),
                           textAlign: TextAlign.end,
-                          style: TextStyle(fontSize: 30, color: Colors.white,)),
+                          style: TextStyle(fontSize: 30, color: colorLightGreen,)),
                       );
                     }
                   ),
@@ -161,7 +175,7 @@ class CalcAppState extends State<CalcApp> {
                     formatedExpression(_expression),
                     style: TextStyle(
                       fontSize: 48,
-                      color: Colors.white,
+                      color: colorLightGreen,
                     ),
                   ),
                 ),
@@ -173,25 +187,53 @@ class CalcAppState extends State<CalcApp> {
                 children: <Widget>[
                   CalcButton(
                     text: 'AC',
-                    fillColor: 0xFF6C807F,
+                    fillColor: colorGreen,
                     textSize: 20,
                     callback: allClear,
                   ),
                   CalcButton(
-                    text: 'C',
-                    fillColor: 0xFF6C807F,
+                    child: Icon(Icons.arrow_back, color: colorWhite),
+                    fillColor: colorGreen,
+                    textColor: colorLightGreen,
                     callback: removeLast,
                   ),
                   CalcButton(
+                    text: '',
+                    fillColor: colorWhite,
+                    textColor: colorLightGreen,
+                    callback: voidClick,
+                  ),
+                  CalcButton(
+                    text: '',
+                    fillColor: colorWhite,
+                    textColor: colorLightGreen,
+                    callback: voidClick,
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  CalcButton(
+                    text: '(',
+                    fillColor: colorGreen,
+                    callback: numClick,
+                  ),
+                  CalcButton(
+                    text: ')',
+                    fillColor: colorGreen,
+                    callback: numClick,
+                  ),
+                  CalcButton(
                     text: '%',
-                    fillColor: 0xFFFFFFFF,
-                    textColor: 0xFF65BDAC,
+                    fillColor: colorWhite,
+                    textColor: colorLightGreen,
                     callback: numClick,
                   ),
                   CalcButton(
                     text: '/',
-                    fillColor: 0xFFFFFFFF,
-                    textColor: 0xFF65BDAC,
+                    fillColor: colorWhite,
+                    textColor: colorLightGreen,
                     callback: numClick,
                   ),
                 ],
@@ -213,8 +255,8 @@ class CalcAppState extends State<CalcApp> {
                   ),
                   CalcButton(
                     text: 'x',
-                    fillColor: 0xFFFFFFFF,
-                    textColor: 0xFF65BDAC,
+                    fillColor: colorWhite,
+                    textColor: colorLightGreen,
                     textSize: 24,
                     callback: numClick,
                   ),
@@ -237,8 +279,8 @@ class CalcAppState extends State<CalcApp> {
                   ),
                   CalcButton(
                     text: '-',
-                    fillColor: 0xFFFFFFFF,
-                    textColor: 0xFF65BDAC,
+                    fillColor: colorWhite,
+                    textColor: colorLightGreen,
                     textSize: 38,
                     callback: numClick,
                   ),
@@ -261,8 +303,8 @@ class CalcAppState extends State<CalcApp> {
                   ),
                   CalcButton(
                     text: '+',
-                    fillColor: 0xFFFFFFFF,
-                    textColor: 0xFF65BDAC,
+                    fillColor: colorWhite,
+                    textColor: colorLightGreen,
                     textSize: 30,
                     callback: numClick,
                   ),
@@ -286,8 +328,8 @@ class CalcAppState extends State<CalcApp> {
                   ),
                   CalcButton(
                     text: '=',
-                    fillColor: 0xFFFFFFFF,
-                    textColor: 0xFF65BDAC,
+                    fillColor: colorWhite,
+                    textColor: colorLightGreen,
                     callback: evaluate,
                   ),
                 ],
@@ -334,22 +376,28 @@ class CalcAppState extends State<CalcApp> {
           resultText += " = ";
           break;
         case TokenType.UNMINUS:
-          resultText += " -";
+          resultText += "-";
           break;
         case TokenType.PLUS:
-          resultText += " + ";
+          resultText += "+";
           break;
         case TokenType.MINUS:
-          resultText += " - ";
+          resultText += "-";
           break;
         case TokenType.TIMES:
-          resultText += " x ";
+          resultText += "x";
           break;
         case TokenType.DIV:
-          resultText += " / ";
+          resultText += "/";
           break;
         case TokenType.MOD:
-          resultText += " % ";
+          resultText += "%";
+          break;
+        case TokenType.LBRACE:
+          resultText += "(";
+          break;
+        case TokenType.RBRACE:
+          resultText += ")";
           break;
         case TokenType.POW:
           break;
