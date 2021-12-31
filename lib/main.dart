@@ -16,12 +16,13 @@ class CalcApp extends StatefulWidget {
 }
 
 class CalcAppState extends State<CalcApp> {
+  final String _version = "v1.0.1";
+  final ScrollController _controller = ScrollController();
+
   List<String> _history = [""];
   String _expression = '';
   bool isFirst = true;
 
-
-  final ScrollController _controller = ScrollController();
 
   void _scrollDown() {
     _controller.animateTo(
@@ -280,7 +281,18 @@ class CalcAppState extends State<CalcApp> {
                   ),
                 ],
               ),
-              SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Text(
+                    _version,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
