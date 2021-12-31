@@ -19,6 +19,8 @@ class CalcAppState extends State<CalcApp> {
   List<String> _history = [""];
   String _expression = '';
   bool isFirst = true;
+
+
   final ScrollController _controller = ScrollController();
 
   void _scrollDown() {
@@ -29,16 +31,41 @@ class CalcAppState extends State<CalcApp> {
     );
   }
 
-  bool _isNumeric(String str) {
+  bool isNumeric(String str) {
     if(str == null) {
       return false;
     }
     return double.tryParse(str) != null;
   }
 
+  bool isAvailableOperator(String operator) {
+    if (isNumeric(operator)) {
+      return true;
+    }
+    if (_expression.length == 0) {
+      return true;
+    }
+    if (isNumeric(_expression[_expression.length-1])) {
+      return true;
+    }
+    if (operator == "-") {
+      return true;
+    }
+    return false;
+  }
+
   void numClick(String text) {
-    if (isFirst && _isNumeric(text)) {
-      _expression = "";
+    if (text == "x")
+      text = "*";
+
+    if (isFirst) {
+      if (isNumeric(text)) {
+        _expression = "";
+      }
+    }
+
+    if (isAvailableOperator(text) == false) {
+      return;
     }
 
     setState(() => _expression += text);
@@ -65,7 +92,13 @@ class CalcAppState extends State<CalcApp> {
       return;
     }
     Parser p = Parser();
-    Expression exp = p.parse(_expression);
+    Expression exp;
+    try {
+      exp = p.parse(_expression);
+    } catch (e) {
+      //print("error : $e");
+      return;
+    }
     ContextModel cm = ContextModel();
 
     setState(() {
@@ -167,7 +200,7 @@ class CalcAppState extends State<CalcApp> {
                     callback: numClick,
                   ),
                   CalcButton(
-                    text: '*',
+                    text: 'x',
                     fillColor: 0xFFFFFFFF,
                     textColor: 0xFF65BDAC,
                     textSize: 24,
