@@ -16,7 +16,7 @@ class CalcApp extends StatefulWidget {
 }
 
 class CalcAppState extends State<CalcApp> {
-  final String _version = "v1.0.4";
+  final String _version = "v1.0.5";
   final ScrollController _controller = ScrollController();
 
   final colorDarkGreen = Color(0xFF283637);
@@ -26,7 +26,7 @@ class CalcAppState extends State<CalcApp> {
 
   List<String> _history = [""];
   String _expression = '';
-  bool get isFirst => _expression.isEmpty;
+  bool afterEval = true;
 
   void _scrollDown() {
     _controller.animateTo(
@@ -78,9 +78,10 @@ class CalcAppState extends State<CalcApp> {
     if (text == "x")
       text = "*";
 
-    if (isFirst) {
+    if (afterEval) {
       if (isNumeric(text)) {
         _expression = "";
+        afterEval = false;
       }
     }
 
@@ -107,7 +108,7 @@ class CalcAppState extends State<CalcApp> {
   }
 
   void evaluate(String text) {
-    if (isFirst && text == "=") {
+    if (_expression.isEmpty && text == "=") {
       return;
     }
     Parser p = Parser();
@@ -127,6 +128,7 @@ class CalcAppState extends State<CalcApp> {
         _history.add(_expression + " = " + result);
       }
       _expression = exp.evaluate(EvaluationType.REAL, cm).toString();
+      afterEval = true;
 
       Future.delayed(Duration(milliseconds: 50)).then((value) => _scrollDown());
     });
