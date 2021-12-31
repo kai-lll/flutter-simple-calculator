@@ -86,7 +86,7 @@ class CalcAppState extends State<CalcApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Calculator',
+      title: 'Kai CALC',
       home: Scaffold(
         backgroundColor: Color(0xFF283637),
         body: Container(
