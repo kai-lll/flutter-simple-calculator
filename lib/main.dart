@@ -16,7 +16,7 @@ class CalcApp extends StatefulWidget {
 }
 
 class CalcAppState extends State<CalcApp> {
-  final String _version = "v1.0.3";
+  final String _version = "v1.0.4";
   final ScrollController _controller = ScrollController();
 
   final colorDarkGreen = Color(0xFF283637);
