@@ -16,7 +16,7 @@ class CalcApp extends StatefulWidget {
 }
 
 class CalcAppState extends State<CalcApp> {
-  final String _version = "v1.0.1";
+  final String _version = "v1.0.2";
   final ScrollController _controller = ScrollController();
 
   List<String> _history = [""];
