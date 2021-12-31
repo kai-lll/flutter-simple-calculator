@@ -21,8 +21,7 @@ class CalcAppState extends State<CalcApp> {
 
   List<String> _history = [""];
   String _expression = '';
-  bool isFirst = true;
-
+  bool get isFirst => _expression.isEmpty;
 
   void _scrollDown() {
     _controller.animateTo(
@@ -36,22 +35,29 @@ class CalcAppState extends State<CalcApp> {
     if(str == null) {
       return false;
     }
-    return double.tryParse(str) != null;
+    try {
+      return double.tryParse(str) != null;
+    } catch (e) {
+      return false;
+    }
   }
 
   bool isAvailableOperator(String operator) {
     if (isNumeric(operator)) {
       return true;
     }
-    if (_expression.length == 0) {
-      return true;
-    }
-    if (isNumeric(_expression[_expression.length-1])) {
-      return true;
-    }
     if (operator == "-") {
       return true;
     }
+    if (_expression.isNotEmpty) {
+      bool isNumericEnd = isNumeric(_expression[_expression.length-1]);
+      if (isNumericEnd) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
     return false;
   }
 
@@ -70,7 +76,6 @@ class CalcAppState extends State<CalcApp> {
     }
 
     setState(() => _expression += text);
-    isFirst = false;
   }
 
   void allClear(String text) {
@@ -112,8 +117,6 @@ class CalcAppState extends State<CalcApp> {
 
       Future.delayed(Duration(milliseconds: 50)).then((value) => _scrollDown());
     });
-
-    isFirst = true;
   }
 
   @override
@@ -136,9 +139,17 @@ class CalcAppState extends State<CalcApp> {
                     shrinkWrap: true,
                     itemCount: _history.length,
                     itemBuilder: (BuildContext context,int index){
-                      return Text(formatedExpression(_history[index]),
-                        textAlign: TextAlign.end,
-                        style: TextStyle(fontSize: 30, color: Colors.white,));
+                      return GestureDetector(
+                        onTap: () {
+                          String exp = _history[index].split("=").first;
+                          setState(() {
+                            _expression = exp;
+                          });
+                        },
+                        child: Text(formatedExpression(_history[index]),
+                          textAlign: TextAlign.end,
+                          style: TextStyle(fontSize: 30, color: Colors.white,)),
+                      );
                     }
                   ),
                 ),
