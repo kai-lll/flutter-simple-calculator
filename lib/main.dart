@@ -51,9 +51,12 @@ class CalcAppState extends State<CalcApp> {
     });
   }
 
-  void clear(String text) {
+  void removeLast(String text) {
+    if (_expression.length < 1) {
+      return;
+    }
     setState(() {
-      _expression = '';
+      _expression = _expression.substring(0, _expression.length-1);
     });
   }
 
@@ -129,7 +132,7 @@ class CalcAppState extends State<CalcApp> {
                   CalcButton(
                     text: 'C',
                     fillColor: 0xFF6C807F,
-                    callback: clear,
+                    callback: removeLast,
                   ),
                   CalcButton(
                     text: '%',
@@ -240,7 +243,8 @@ class CalcAppState extends State<CalcApp> {
                     callback: evaluate,
                   ),
                 ],
-              )
+              ),
+              SizedBox(height: 40),
             ],
           ),
         ),
