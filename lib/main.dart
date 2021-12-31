@@ -19,6 +19,15 @@ class CalcAppState extends State<CalcApp> {
   List<String> _history = [""];
   String _expression = '';
   bool isFirst = true;
+  final ScrollController _controller = ScrollController();
+
+  void _scrollDown() {
+    _controller.animateTo(
+      _controller.position.maxScrollExtent,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.ease,
+    );
+  }
 
   bool _isNumeric(String str) {
     if(str == null) {
@@ -38,7 +47,6 @@ class CalcAppState extends State<CalcApp> {
 
   void allClear(String text) {
     setState(() {
-      _history = [];
       _expression = '';
     });
   }
@@ -61,6 +69,8 @@ class CalcAppState extends State<CalcApp> {
       var result = exp.evaluate(EvaluationType.REAL, cm).toString();
       _history.add(_expression + " = " + result);
       _expression = exp.evaluate(EvaluationType.REAL, cm).toString();
+
+      Future.delayed(Duration(milliseconds: 50)).then((value) => _scrollDown());
     });
 
     isFirst = true;
@@ -82,12 +92,14 @@ class CalcAppState extends State<CalcApp> {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 30),
                   child: ListView.builder(
-                      itemCount: _history.length,
-                      itemBuilder: (BuildContext context,int index){
-                        return Text(formatedExpression(_history[index]),
-                          textAlign: TextAlign.end,
-                          style: TextStyle(fontSize: 30, color: Colors.white,));
-                      }
+                    controller: _controller,
+                    shrinkWrap: true,
+                    itemCount: _history.length,
+                    itemBuilder: (BuildContext context,int index){
+                      return Text(formatedExpression(_history[index]),
+                        textAlign: TextAlign.end,
+                        style: TextStyle(fontSize: 30, color: Colors.white,));
+                    }
                   ),
                 ),
               ),
@@ -240,7 +252,7 @@ class CalcAppState extends State<CalcApp> {
     if (expression == '')
       return '';
 
-    print("raw : $expression");
+    //print("raw : $expression");
 
     var lex = Lexer();
     final List<Token> inputStream = lex.tokenize(expression);
@@ -253,7 +265,7 @@ class CalcAppState extends State<CalcApp> {
       switch (currToken.type) {
         case TokenType.VAL:
           resultText += nf.format(double.parse(currToken.text));
-          print(resultText);
+          //print(resultText);
           break;
         case TokenType.VAR:
           resultText += " = ";
@@ -312,7 +324,7 @@ class CalcAppState extends State<CalcApp> {
           throw FormatException('Unsupported token: $currToken');
       }
 
-      print("currToken : ${currToken.text} ${currToken.type}");
+      //print("currToken : ${currToken.text} ${currToken.type}");
     }
 
     return resultText;
