@@ -70,7 +70,10 @@ class CalcAppState extends State<CalcApp> {
 
     setState(() {
       var result = exp.evaluate(EvaluationType.REAL, cm).toString();
-      _history.add(_expression + " = " + result);
+      var newHistory = _expression + " = " + result;
+      if (_history.last != newHistory) {
+        _history.add(_expression + " = " + result);
+      }
       _expression = exp.evaluate(EvaluationType.REAL, cm).toString();
 
       Future.delayed(Duration(milliseconds: 50)).then((value) => _scrollDown());
