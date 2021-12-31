@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CalcButton extends StatelessWidget {
   final String text;
@@ -33,10 +32,8 @@ class CalcButton extends StatelessWidget {
           },
           child: Text(
             text,
-            style: GoogleFonts.rubik(
-              textStyle: TextStyle(
-                fontSize: textSize,
-              ),
+            style: TextStyle(
+              fontSize: textSize,
             ),
           ),
           color: fillColor != null ? Color(fillColor) : null,

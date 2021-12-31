@@ -1,6 +1,6 @@
+import 'package:intl/intl.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import './widgets/CalcButton.dart';
 
@@ -16,16 +16,29 @@ class CalcApp extends StatefulWidget {
 }
 
 class CalcAppState extends State<CalcApp> {
-  String _history = '';
+  List<String> _history = [""];
   String _expression = '';
+  bool isFirst = true;
+
+  bool _isNumeric(String str) {
+    if(str == null) {
+      return false;
+    }
+    return double.tryParse(str) != null;
+  }
 
   void numClick(String text) {
+    if (isFirst && _isNumeric(text)) {
+      _expression = "";
+    }
+
     setState(() => _expression += text);
+    isFirst = false;
   }
 
   void allClear(String text) {
     setState(() {
-      _history = '';
+      _history = [];
       _expression = '';
     });
   }
@@ -37,14 +50,20 @@ class CalcAppState extends State<CalcApp> {
   }
 
   void evaluate(String text) {
+    if (isFirst && text == "=") {
+      return;
+    }
     Parser p = Parser();
     Expression exp = p.parse(_expression);
     ContextModel cm = ContextModel();
 
     setState(() {
-      _history = _expression;
+      var result = exp.evaluate(EvaluationType.REAL, cm).toString();
+      _history.add(_expression + " = " + result);
       _expression = exp.evaluate(EvaluationType.REAL, cm).toString();
     });
+
+    isFirst = true;
   }
 
   @override
@@ -59,31 +78,27 @@ class CalcAppState extends State<CalcApp> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              Container(
+              Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: Text(
-                    _history,
-                    style: GoogleFonts.rubik(
-                      textStyle: TextStyle(
-                        fontSize: 24,
-                        color: Color(0xFF545F61),
-                      ),
-                    ),
+                  padding: const EdgeInsets.only(right: 30),
+                  child: ListView.builder(
+                      itemCount: _history.length,
+                      itemBuilder: (BuildContext context,int index){
+                        return Text(formatedExpression(_history[index]),
+                          textAlign: TextAlign.end,
+                          style: TextStyle(fontSize: 30, color: Colors.white,));
+                      }
                   ),
                 ),
-                alignment: Alignment(1.0, 1.0),
               ),
               Container(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Text(
-                    _expression,
-                    style: GoogleFonts.rubik(
-                      textStyle: TextStyle(
-                        fontSize: 48,
-                        color: Colors.white,
-                      ),
+                    formatedExpression(_expression),
+                    style: TextStyle(
+                      fontSize: 48,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -204,7 +219,7 @@ class CalcAppState extends State<CalcApp> {
                   CalcButton(
                     text: '00',
                     callback: numClick,
-                    textSize: 26,
+                    textSize: 25,
                   ),
                   CalcButton(
                     text: '=',
@@ -219,5 +234,87 @@ class CalcAppState extends State<CalcApp> {
         ),
       ),
     );
+  }
+
+  String formatedExpression(String expression) {
+    if (expression == '')
+      return '';
+
+    print("raw : $expression");
+
+    var lex = Lexer();
+    final List<Token> inputStream = lex.tokenize(expression);
+
+    var nf = NumberFormat("###,###.##########", "en_US");
+
+    String resultText = "";
+    for (Token currToken in inputStream) {
+
+      switch (currToken.type) {
+        case TokenType.VAL:
+          resultText += nf.format(double.parse(currToken.text));
+          print(resultText);
+          break;
+        case TokenType.VAR:
+          resultText += " = ";
+          break;
+        case TokenType.UNMINUS:
+          resultText += " -";
+          break;
+        case TokenType.PLUS:
+          resultText += " + ";
+          break;
+        case TokenType.MINUS:
+          resultText += " - ";
+          break;
+        case TokenType.TIMES:
+          resultText += " x ";
+          break;
+        case TokenType.DIV:
+          resultText += " / ";
+          break;
+        case TokenType.MOD:
+          resultText += " % ";
+          break;
+        case TokenType.POW:
+          break;
+        case TokenType.EFUNC:
+          break;
+        case TokenType.LOG:
+          break;
+        case TokenType.LN:
+          break;
+        case TokenType.SQRT:
+          break;
+        case TokenType.ROOT:
+          break;
+        case TokenType.SIN:
+          break;
+        case TokenType.COS:
+          break;
+        case TokenType.TAN:
+          break;
+        case TokenType.ASIN:
+          break;
+        case TokenType.ACOS:
+          break;
+        case TokenType.ATAN:
+          break;
+        case TokenType.ABS:
+          break;
+        case TokenType.CEIL:
+          break;
+        case TokenType.FLOOR:
+          break;
+        case TokenType.SGN:
+          break;
+        default:
+          throw FormatException('Unsupported token: $currToken');
+      }
+
+      print("currToken : ${currToken.text} ${currToken.type}");
+    }
+
+    return resultText;
   }
 }
