@@ -20,14 +20,15 @@ jobs:
       - run: |
           cd build/web
           git init
+          git config --global init.defaultBranch master
           # type configurations: your user.email and user.name followed lines 
           # git config --global user.email your_email 
           # git config --global user.name your_name 
           git config --global user.email ashira11@snu.ac.kr
           git config --global user.name kai-lll
-          # git status
+          git status
           # change this remote url for examle your remote url is https://github.com:kai-lll/kai-lll.github.io.git then the following:
-          git remote add origin https://${{secrets.commit_secret}}@github.com/kai-lll/kai-lll.github.io.git
+          git remote add origin https://${{secrets.commit_secret}}@github.com:kai-lll/kai-lll.github.io.git
           git checkout -b master
           git add --all
           git commit -m "update"
