@@ -28,7 +28,7 @@ jobs:
           git config --global user.name kai-lll
           git status
           # change this remote url for examle your remote url is https://github.com:kai-lll/kai-lll.github.io.git then the following:
-          git remote add origin ${{secrets.commit_secret}}@github.com:kai-lll/kai-lll.github.io.git
+          git remote set-url origin ${{secrets.commit_secret}}@github.com:kai-lll/kai-lll.github.io.git
           git remote -v
           git checkout -b master
           git add --all
